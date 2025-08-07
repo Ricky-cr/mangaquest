@@ -1,12 +1,13 @@
-const defaultTheme = require('tailwindcss/defaultTheme');
-const colors = require('tailwindcss/colors');
+import defaultTheme from 'tailwindcss/defaultTheme';
+import colors from 'tailwindcss/colors';
+import flowbiteReact from 'flowbite-react/plugin/tailwindcss';
+import 'flowbite';
 
 module.exports = {
   content: [
     './pages/**/*.{js,ts,jsx,tsx}',
     './components/**/*.{js,ts,jsx,tsx}',
-    './app/**/*.{js,ts,jsx,tsx}',
-    './node_modules/flowbite-react/**/*.js',
+    '.flowbite-react\\class-list.json',
   ],
   theme: {
     extend: {
@@ -23,17 +24,17 @@ module.exports = {
         notojp: ['var(--font-notojp)', ...defaultTheme.fontFamily.sans],
       },
       screens: {
-        xs: '400px',   // 👉 mobile molto piccolo
+        xs: '400px',
         sm: '640px',
         md: '768px',
         lg: '1024px',
         xl: '1280px',
         '2xl': '1536px',
-        '3xl': '1800px',  // 👉 desktop 2K
-        '4xl': '2200px',  // 👉 ultra-wide
+        '3xl': '1800px',
+        '4xl': '2200px',
       },
     },
   },
-  // plugins: [require('flowbite/plugin')],
+  plugins: [flowbiteReact],
   darkMode: 'media',
 };
