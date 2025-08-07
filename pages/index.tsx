@@ -1,86 +1,83 @@
-import { useEffect, useState } from "react";
-import Modal from "../components/Modal";
+import { useEffect, useState } from 'react'
+import Modal from '../components/Modal'
+import MangaCard from '../components/MangaCard'
 
 interface Manga {
-  mal_id: number;
-  title: string;
+  mal_id: number
+  title: string
+  synopsis: string
   images: {
     jpg: {
-      image_url: string;
-    };
-  };
-  synopsis?: string;
+      image_url: string
+    }
+  }
 }
 
 export default function Home() {
-  const [mangaList, setMangaList] = useState<Manga[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [isModalOopen, setIsModalOpen] = useState(false);
-  const [selectedManga, setSelectedManga] = useState<Manga | null>(null);
+  const [mangaList, setMangaList] = useState<Manga[]>([])
+  const [loading, setLoading] = useState(true)
+  const [isModalOpen, setIsModalOpen] = useState(false)
+  const [selectedMangaId, setSelectedMangaId] = useState<number | null>(null)
 
-  // Funzione per aprire Modale
-  const openModal = (manga: Manga) => {
-    setSelectedManga(manga);
-    setIsModalOpen(true);
-  };
-
-  // Funzione per chiudere Modale
-  const closeModal = () => {
-    setSelectedManga(null);
-    setIsModalOpen(false);
-  };
-
-  // Funzione per recuperare i dati dei manga
-  // Utilizza l'API Jikan per ottenere i manga popolari
-  // Gestisce gli errori e lo stato di caricamento
-
-  const fetchManga = async () => {
-    try {
-      const res = await fetch("https://api.jikan.moe/v4/manga");
-      const data = await res.json();
-      setMangaList(data.data);
-    } catch (error) {
-      console.error("Errore nel recupero dei dati:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  // useEffect -> esegue fetchManga al caricamento del componente
   useEffect(() => {
-    fetchManga();
-  }, []);
+    const fetchManga = async () => {
+      try {
+        const res = await fetch('https://api.jikan.moe/v4/top/manga')
+        const data = await res.json()
+        setMangaList(data.data.slice(0, 15))
+      } catch (error) {
+        console.error('Errore nel recupero dati:', error)
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    fetchManga()
+  }, [])
+
+  const openModal = (id: number) => {
+    setSelectedMangaId(id)
+    setIsModalOpen(true)
+  }
+
+  const closeModal = () => {
+    setSelectedMangaId(null)
+    setIsModalOpen(false)
+  }
+
+  const handleAdd = (manga: Manga, categoria: string) => {
+    console.log(`[${categoria}]`, manga.title)
+  }
 
   return (
-    <div className="p-6">
-      <h1 className="text-4xl font-poppins text-mq-blue mb-6">
-        {" "}
-        Manga Popolari{" "}
-      </h1>
+    <div className="p-6 w-full mx-auto">
+      <h1 className="text-3xl font-poppins text-mq-blue mb-6">Manga Popolari</h1>
+
       {loading ? (
-        <p className="text-white"> Caricamento... </p>
+        <p className="text-white">Caricamento...</p>
       ) : (
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 3xl:grid-cols-5 4xl:grid-cols-6 gap-6 rounded-md">
           {mangaList.map((manga) => (
-            <div
-              key={manga.mal_id}
-              className="bg-mq-dark rounded-lg shadow-lg overflow-hidden hover:scale-105 transition-transform"
-            >
-              <img
-                src={manga.images.jpg.image_url}
-                alt={manga.title}
-                className="w-full h-64 object-cover"
+            <div key={manga.mal_id} className="w-full">
+              <MangaCard
+                title={manga.title}
+                imageUrl={manga.images.jpg.image_url}
+                synopsis={manga.synopsis || 'Nessuna descrizione disponibile.'}
+                onOpenModal={() => openModal(manga.mal_id)}
+                onAddToFavorites={() => handleAdd(manga, 'Preferiti')}
+                onAddToReading={() => handleAdd(manga, 'In lettura')}
+                onMarkAsRead={() => handleAdd(manga, 'Letto')}
               />
-              <div className="p-4">
-                <h2 className="text-lg font-mplus text-white">
-                  {" "}
-                  {manga.title}{" "}
-                </h2>
-              </div>
             </div>
           ))}
         </div>
       )}
+
+      <Modal
+        isOpen={isModalOpen}
+        onClose={closeModal}
+        mangaId={selectedMangaId}
+      />
     </div>
-  );
+  )
 }
