@@ -2,6 +2,7 @@
 import type { Metadata } from 'next'
 import { Rajdhani } from 'next/font/google'
 import "../styles/globals.css"
+import { ThemeInit } from '../.flowbite-react/init'
 
 // ⬇️ Se usi la config runtime di Flowbite React (.flowbite-react/config.json),
 // importa ThemeInit e montalo (altrimenti puoi rimuovere queste 2 righe).
@@ -29,7 +30,7 @@ export default function RootLayout({
       <body
         className={`${rajdhani.variable} bg-background text-white antialiased min-h-dvh`}
       >
-        {/* <ThemeInit /> */}
+        <ThemeInit />
         {children}
       </body>
     </html>
